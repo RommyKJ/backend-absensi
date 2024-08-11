@@ -96,7 +96,7 @@ const patchUpdateUser = async (req, res) => {
     const { body } = req;
     const [data] = await UserModel.patchUserData(idUser, body);
     res.status(201).json({
-      message: "Data karyawan berhasil ditambahkan!",
+      message: "Data karyawan berhasil diupdate!",
       data: body,
     });
   } catch (error) {
