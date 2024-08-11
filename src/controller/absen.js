@@ -4,31 +4,15 @@ const path = require("path");
 
 // Setup Multer for file upload
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "../uploads/");
+  destination: function (req, file, cb) {
+    cb(null, "src/uploads"); // Tentukan direktori penyimpanan
   },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}_${file.originalname}`;
-    cb(null, uniqueName);
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "_" + file.originalname); // Tentukan nama file yang unik
   },
 });
 
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png/;
-    const extname = filetypes.test(
-      path.extname(file.originalname).toLowerCase()
-    );
-    const mimetype = filetypes.test(file.mimetype);
-
-    if (extname && mimetype) {
-      return cb(null, true);
-    } else {
-      cb("Error: Images Only!"); // Filter out non-image files
-    }
-  },
-}).single("img_wfh");
+const upload = multer({ storage: storage }).single("img_wfh");
 
 const postAbsensiUser = async (req, res) => {
   upload(req, res, async (err) => {
@@ -41,10 +25,9 @@ const postAbsensiUser = async (req, res) => {
     try {
       const { body, file } = req;
 
-      // Buat objek data yang akan dimasukkan ke database
       const dataToInsert = {
         ...body,
-        img_wfh: file ? file.path : null, // Path gambar jika ada, null jika tidak ada gambar
+        img_wfh: file ? `src/uploads/${file.filename}` : null,
       };
 
       const [data] = await absenModel.postAbsensiUser(dataToInsert);

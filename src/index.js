@@ -12,6 +12,7 @@ const app = express();
 app.use(middleware);
 app.use(express.json());
 app.use(cors());
+app.use("/img", express.static("src/uploads"));
 app.use("/users", usersRoute);
 app.use("/absen", absenRoute);
 app.listen(PORT, () => {

@@ -90,9 +90,27 @@ const postAddUser = async (req, res) => {
   }
 };
 
+const patchUpdateUser = async (req, res) => {
+  try {
+    const { idUser } = req.params;
+    const { body } = req;
+    const [data] = await UserModel.patchUserData(idUser, body);
+    res.status(201).json({
+      message: "Data karyawan berhasil ditambahkan!",
+      data: body,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server Error",
+      serverMessage: error,
+    });
+  }
+};
+
 module.exports = {
   getAllUser,
   getUserById,
   loginUser,
   postAddUser,
+  patchUpdateUser,
 };

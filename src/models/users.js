@@ -20,9 +20,21 @@ const postAddUser = (data) => {
   return dbPool.execute(SQLQuery);
 };
 
+const patchUserData = (iduser, data) => {
+  const SQLQuery = `UPDATE users
+  SET nama = '${data.nama}',
+      email = '${data.email}',
+      no_telepon = '${data.no_telepon}',
+      password = '${data.password}',
+      role = '${data.role}'
+  WHERE id = ${iduser};`;
+  return dbPool.execute(SQLQuery);
+};
+
 module.exports = {
   getAllUsers,
   getUserByID,
   loginUser,
   postAddUser,
+  patchUserData,
 };
