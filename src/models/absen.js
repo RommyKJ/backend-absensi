@@ -13,7 +13,22 @@ const getAllAbsensi = () => {
   return dbPool.execute(SQLQuery);
 };
 
+//%a = hari, %b = bulan, %d = hari dalam angka, %Y = Tahun dalam angka, %T = time
+const getAbsensiMasuk = (idUser) => {
+  const SQLQuery = ` SELECT *
+    FROM absensi WHERE idUser = ${idUser} AND DATE(STR_TO_DATE(absen_masuk, '%a %b %d %Y %T GMT+0700 (Western Indonesia Time)')) = CURDATE()`;
+  return dbPool.execute(SQLQuery);
+};
+
+const patchAbsenKeluar = (data) => {
+  const date = new Date();
+  const SQLQuery = `UPDATE absensi SET absen_keluar='${date}' WHERE idUser = ${data.idUser} AND DATE(STR_TO_DATE(absen_masuk, '%a %b %d %Y %T GMT+0700 (Western Indonesia Time)')) = CURDATE()`;
+  return dbPool.execute(SQLQuery);
+};
+
 module.exports = {
   postAbsensiUser,
   getAllAbsensi,
+  patchAbsenKeluar,
+  getAbsensiMasuk,
 };

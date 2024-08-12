@@ -1,4 +1,5 @@
 const dbPool = require("../config/config");
+const bcrypt = require("bcryptjs");
 
 const getAllUsers = () => {
   const SQLQuery = "SELECT * FROM users";
@@ -15,19 +16,37 @@ const loginUser = (data) => {
   return dbPool.execute(SQLQuery);
 };
 
-const postAddUser = (data) => {
-  const SQLQuery = `INSERT INTO users (nama, email, no_telepon, password, role) VALUES ('${data.nama}', '${data.email}', '${data.no_telepon}', '${data.password}', '${data.role}')`;
+const postAddUser = async (data) => {
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+  const SQLQuery = `INSERT INTO users (nama, email, no_telepon, password, role) VALUES ('${data.nama}', '${data.email}', '${data.no_telepon}', '${hashedPassword}', '${data.role}')`;
   return dbPool.execute(SQLQuery);
 };
 
-const patchUserData = (iduser, data) => {
-  const SQLQuery = `UPDATE users
-  SET nama = '${data.nama}',
-      email = '${data.email}',
-      no_telepon = '${data.no_telepon}',
-      password = '${data.password}',
-      role = '${data.role}'
-  WHERE id = ${iduser};`;
+const patchUserData = async (iduser, data) => {
+  let SQLQuery = `UPDATE users SET `;
+  const fieldsToUpdate = [];
+
+  if (data.nama) {
+    fieldsToUpdate.push(`nama = '${data.nama}'`);
+  }
+
+  if (data.email) {
+    fieldsToUpdate.push(`email = '${data.email}'`);
+  }
+
+  if (data.no_telepon) {
+    fieldsToUpdate.push(`no_telepon = '${data.no_telepon}'`);
+  }
+  if (data.password !== "") {
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    fieldsToUpdate.push(`password = '${hashedPassword}'`);
+  }
+
+  if (data.role) {
+    fieldsToUpdate.push(`role = '${data.role}'`);
+  }
+  SQLQuery += fieldsToUpdate.join(", ");
+  SQLQuery += ` WHERE id = ${iduser};`;
   return dbPool.execute(SQLQuery);
 };
 

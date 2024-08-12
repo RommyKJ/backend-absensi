@@ -1,5 +1,6 @@
 const UserModel = require("../models/users");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const getAllUser = async (req, res) => {
   try {
     const [data] = await UserModel.getAllUsers();
@@ -35,13 +36,10 @@ const loginUser = async (req, res) => {
   try {
     const { body } = req;
     const [data] = await UserModel.loginUser(body);
-
     if (data.length !== 0) {
-      // Check password here (e.g., compare hashed passwords)
-      if (data[0].password === body.password) {
-        // Use a secure password comparison method in real applications
-        const payload = { userId: data[0].id }; // Create payload based on your user data
-
+      const isMatch = await bcrypt.compare(body.password, data[0].password);
+      if (isMatch) {
+        const payload = { userId: data[0].id };
         jwt.sign(payload, "secretToken", { expiresIn: "1h" }, (err, token) => {
           if (err) {
             return res.status(500).json({
@@ -67,6 +65,7 @@ const loginUser = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       message: "Server Error",
       serverMessage: err,
@@ -77,7 +76,7 @@ const loginUser = async (req, res) => {
 const postAddUser = async (req, res) => {
   try {
     const { body } = req;
-    const [data] = await UserModel.postAddUser(body);
+    await UserModel.postAddUser(body);
     res.status(201).json({
       message: "Data karyawan berhasil ditambahkan!",
       data: body,
@@ -94,7 +93,7 @@ const patchUpdateUser = async (req, res) => {
   try {
     const { idUser } = req.params;
     const { body } = req;
-    const [data] = await UserModel.patchUserData(idUser, body);
+    await UserModel.patchUserData(idUser, body);
     res.status(201).json({
       message: "Data karyawan berhasil diupdate!",
       data: body,

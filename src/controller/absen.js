@@ -62,4 +62,44 @@ const getAllAbsensi = async (req, res) => {
   }
 };
 
-module.exports = { postAbsensiUser, getAllAbsensi };
+const getAbsensiMasuk = async (req, res) => {
+  try {
+    const { idUser } = req.params;
+    const [data] = await absenModel.getAbsensiMasuk(idUser);
+    res.status(200).json({
+      message: "Get absensi masuk karyawan berhasil",
+      data: data,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Server Error",
+      serverMessage: err,
+    });
+  }
+};
+
+const patchAbsenKeluar = async (req, res) => {
+  try {
+    const { body } = req;
+    const [data] = await absenModel.patchAbsenKeluar(body);
+    res.status(201).json({
+      message: "PATCH absensi keluar karyawan berhasil",
+      data: {
+        idAbsen: data.insertId,
+        ...body,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Server Error",
+      serverMessage: err,
+    });
+  }
+};
+
+module.exports = {
+  postAbsensiUser,
+  getAllAbsensi,
+  patchAbsenKeluar,
+  getAbsensiMasuk,
+};
