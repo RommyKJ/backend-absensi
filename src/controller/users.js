@@ -76,10 +76,14 @@ const loginUser = async (req, res) => {
 const postAddUser = async (req, res) => {
   try {
     const { body } = req;
-    await UserModel.postAddUser(body);
+    const [data] = await UserModel.postAddUser(body);
+    console.log(data);
     res.status(201).json({
       message: "Data karyawan berhasil ditambahkan!",
-      data: body,
+      data: {
+        id: data.insertId,
+        ...body,
+      },
     });
   } catch (error) {
     res.status(500).json({
