@@ -20,15 +20,21 @@ const getAbsensiMasuk = (idUser) => {
   return dbPool.execute(SQLQuery);
 };
 
-const patchAbsenKeluar = (data) => {
+const patchAbsen = (data) => {
   const date = new Date();
-  const SQLQuery = `UPDATE absensi SET absen_keluar='${date}' WHERE idUser = ${data.idUser} AND DATE(STR_TO_DATE(absen_masuk, '%a %b %d %Y %T GMT+0700 (Western Indonesia Time)')) = CURDATE()`;
+  let kolomAbsen;
+  if (data.tipe === "masuk") {
+    kolomAbsen = "absen_masuk";
+  } else {
+    kolomAbsen = "absen_keluar";
+  }
+  const SQLQuery = `UPDATE absensi SET ${kolomAbsen}='${date}' WHERE id = ${data.idAbsen}`;
   return dbPool.execute(SQLQuery);
 };
 
 module.exports = {
   postAbsensiUser,
   getAllAbsensi,
-  patchAbsenKeluar,
+  patchAbsen,
   getAbsensiMasuk,
 };

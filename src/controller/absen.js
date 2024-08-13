@@ -29,12 +29,14 @@ const postAbsensiUser = async (req, res) => {
         ...body,
         img_wfh: file ? `src/uploads/${file.filename}` : null,
       };
-
       const [data] = await absenModel.postAbsensiUser(dataToInsert);
+      const [dataAbsen] = await absenModel.getAbsensiMasuk(body.idUser);
       res.status(201).json({
         message: "POST absensi masuk karyawan berhasil",
         data: {
           idAbsen: data.insertId,
+          absen_masuk: dataAbsen[0].absen_masuk,
+          absen_keluar: dataAbsen[0].absen_keluar,
           ...dataToInsert,
         },
       });
@@ -78,15 +80,15 @@ const getAbsensiMasuk = async (req, res) => {
   }
 };
 
-const patchAbsenKeluar = async (req, res) => {
+const patchAbsen = async (req, res) => {
   try {
     const { body } = req;
-    const [data] = await absenModel.patchAbsenKeluar(body);
+    await absenModel.patchAbsen(body);
+    const [dataAbsen] = await absenModel.getAbsensiMasuk(body.idUser);
     res.status(201).json({
-      message: "PATCH absensi keluar karyawan berhasil",
+      message: "Update absensi karyawan berhasil",
       data: {
-        idAbsen: data.insertId,
-        ...body,
+        ...dataAbsen[0],
       },
     });
   } catch (err) {
@@ -100,6 +102,6 @@ const patchAbsenKeluar = async (req, res) => {
 module.exports = {
   postAbsensiUser,
   getAllAbsensi,
-  patchAbsenKeluar,
+  patchAbsen,
   getAbsensiMasuk,
 };
